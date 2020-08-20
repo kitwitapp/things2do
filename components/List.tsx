@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Text, View } from './Themed';
 import * as SQLite from 'expo-sqlite';
+import { FlatList } from 'react-native-gesture-handler';
 
 const db = SQLite.openDatabase('db.db')
 
 export default function List() {
-  const [tasks, setTasks] = useState({})
+  const [tasks, setTasks] = useState([])
 
   // Not using useEffect, since we want this to run whenever component re-renders
   db.transaction(tx => {
@@ -23,9 +24,10 @@ export default function List() {
       <Text>
         Contents:
       </Text>
-      <Text>
-        {JSON.stringify(tasks)}
-      </Text>
+      <FlatList
+        data={tasks}
+        renderItem={({item}) => <Text>{item.task}</Text>}
+      />
     </View>
   )
 }
