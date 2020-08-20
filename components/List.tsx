@@ -5,7 +5,7 @@ import { FlatList } from 'react-native-gesture-handler';
 
 const db = SQLite.openDatabase('db.db')
 
-export default function List() {
+export default function List({ style }: { style: Object }) {
   const [tasks, setTasks] = useState([])
 
   // Not using useEffect, since we want this to run whenever component re-renders
@@ -20,13 +20,14 @@ export default function List() {
   });
 
   return (
-    <View>
+    <View style={style}>
       <Text>
         Contents:
       </Text>
       <FlatList
         data={tasks}
         renderItem={({item}) => <Text>{item.task}</Text>}
+        style={style}
       />
     </View>
   )
