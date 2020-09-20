@@ -3,6 +3,8 @@ import { Text, View } from './Themed'
 import { TextInput, StyleSheet } from 'react-native'
 import * as SQLite from 'expo-sqlite'
 import { TouchableHighlight } from 'react-native-gesture-handler'
+import DatePicker from '@react-native-community/datetimepicker';
+import { getDateString } from '../utils'
 
 const db = SQLite.openDatabase('app.db')
 
@@ -21,6 +23,7 @@ db.transaction((tx) => {
 export default function InputBox() {
   const [task, setTask] = useState('')
   const [date, setDate] = useState('')
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   function saveToDatabase(task: string, date: string) {
     db.transaction((tx) => {
@@ -29,6 +32,12 @@ export default function InputBox() {
         date,
       ])
     })
+  }
+
+  function onDateChange(event, day: Date) {
+    const taskDate = getDateString(day)
+    setDate(taskDate)
+    setShowDatePicker(false)
   }
 
   return (
@@ -40,13 +49,23 @@ export default function InputBox() {
         placeholder="Add a task..."
         style={styles.input}
       />
-      <TextInput
-        onChangeText={(value) => {
-          setDate(value)
-        }}
-        placeholder="Set date (in YYYY-MM-DD format)"
-        style={styles.input}
-      />
+
+      <TouchableHighlight
+        onPress={() => setShowDatePicker(true)}
+        style={styles.button}
+      >
+        <Text>Set Date</Text>
+      </TouchableHighlight>
+
+      {
+        showDatePicker &&
+          <DatePicker
+          value={new Date()}
+          mode='date'
+          onChange={onDateChange}
+          />
+      }
+
       <TouchableHighlight
         onPress={() => saveToDatabase(task, date)}
         style={styles.button}
@@ -75,5 +94,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     color: '#fff',
     padding: 10,
+    marginVertical: 10
   },
 })
