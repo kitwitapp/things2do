@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Text, View } from './Themed'
-import { TextInput, StyleSheet } from 'react-native'
+import { Alert, TextInput, StyleSheet } from 'react-native'
 import * as SQLite from 'expo-sqlite'
 import { TouchableHighlight } from 'react-native-gesture-handler'
 import DatePicker from '@react-native-community/datetimepicker';
-import { getDateString } from '../utils'
+import { getDateString, getRandomSubject } from '../utils'
 
 const db = SQLite.openDatabase('app.db')
 
@@ -14,6 +14,7 @@ db.transaction((tx) => {
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY,
       task TEXT,
+      subject TEXT,
       date TEXT
     )`,
     []
@@ -27,10 +28,14 @@ export default function InputBox() {
 
   function saveToDatabase(task: string, date: string) {
     db.transaction((tx) => {
-      tx.executeSql('INSERT INTO `tasks` (task, date) VALUES (?, ?)', [
+      tx.executeSql('INSERT INTO `tasks` (task, subject, date) VALUES (?, ?, ?)', [
         task,
+        getRandomSubject(),
         date,
-      ])
+      ],
+      (_t) => {
+        Alert.alert('Entry saved in database.', 'Message: Data saved.')
+      })
     })
   }
 
