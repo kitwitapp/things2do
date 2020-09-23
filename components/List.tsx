@@ -20,13 +20,11 @@ export default function List({ style }: { style: Object }) {
         `SELECT date FROM tasks`,
         [],
         (_, { rows }) => {
-          console.log('[APP] _array contains: ', JSON.stringify(rows['_array']))
-          console.log('[APP] markedDates is  : ', JSON.stringify(markedDates))
           setMarkedDates(prepareMarkedDates(rows['_array']))
         }
       )
     })
-  }, [markedDates, tasks])
+  }, [])
 
   function setTasksForDate(date: string) {
     db.transaction(tx => {
