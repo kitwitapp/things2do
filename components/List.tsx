@@ -1,30 +1,43 @@
-import React, { useState } from 'react';
-import { Text, View } from './Themed';
-import * as SQLite from 'expo-sqlite';
-import { FlatList } from 'react-native-gesture-handler';
-import { Calendar, Agenda } from 'react-native-calendars';
-import SortableList from 'react-native-sortable-list';
-import { getDummyData } from '../utils';
-import { StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { Text, View } from './Themed'
+import * as SQLite from 'expo-sqlite'
+import { FlatList } from 'react-native-gesture-handler'
+import { Calendar } from 'react-native-calendars'
+import SortableList from 'react-native-sortable-list'
+import { getDummyData, prepareMarkedDates } from '../utils'
+import { StyleSheet } from 'react-native'
 
 const db = SQLite.openDatabase('app.db')
 
 export default function List({ style }: { style: Object }) {
   const [tasks, setTasks] = useState([])
-  const [date, setDate] = useState('')
+  const [markedDates, setMarkedDates] = useState({})
+  const [] = useState('')
 
-  function getTasksByDate(date: string) {
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT date FROM tasks`,
+        [],
+        (_, { rows }) => {
+          console.log('[APP] _array contains: ', JSON.stringify(rows['_array']))
+          console.log('[APP] markedDates is  : ', JSON.stringify(markedDates))
+          setMarkedDates(prepareMarkedDates(rows['_array']))
+        }
+      )
+    })
+  }, [markedDates, tasks])
+
+  function setTasksForDate(date: string) {
     db.transaction(tx => {
       tx.executeSql(
         `SELECT task, date FROM tasks WHERE date = ?`,
         [date],
-        (_, { rows }) => setTasks(rows['_array'])
+        (_, { rows }) => {
+          setTasks(rows['_array'])
+        }
       )
     })
-  }
-
-  function _renderRow({ data }) {
-    return <Row data={data} />
   }
 
   return (
@@ -33,16 +46,28 @@ export default function List({ style }: { style: Object }) {
         style={{
           borderWidth: 1,
         }}
-        onDayPress={(date) => { getTasksByDate(date['dateString']) }}
-        />
+        onDayPress={(date) => { setTasksForDate(date['dateString']) }}
+        markedDates={markedDates}
+      />
       <View>
+        <FlatList
+          keyExtractor={(item, _idx) => item['task']}
+          data={tasks}
+          renderItem={({item}) => <Text>{item['task']}</Text>}
+        />
+      </View>
+      {/* <View>
         <SortableList
           data={getDummyData()}
           renderRow={_renderRow}
           />
-      </View>
+      </View> */}
     </View>
   )
+}
+
+function _renderRow(data) {
+  return <Row data={data} />
 }
 
 function Row ({ data }) {
