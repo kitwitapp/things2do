@@ -11,10 +11,10 @@ function _renderRow(data) {
 
 function Row ({ data }) {
 return (
-  <View>
-    <Text style={styles.row}>{data.key} {JSON.stringify(data, null, 2)}</Text>
-  </View>
-)
+    <View>
+      <Text style={styles.row}>{data.key} {JSON.stringify(data, null, 2)}</Text>
+    </View>
+  )
 }
 
 export default function(props) {
