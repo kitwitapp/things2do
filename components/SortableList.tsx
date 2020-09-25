@@ -1,3 +1,4 @@
+import React from 'react'
 import { Text, View } from './Themed'
 import SortableList from 'react-native-sortable-list'
 import { StyleSheet } from 'react-native'
@@ -16,11 +17,13 @@ return (
 )
 }
 
-export default function() {
-  <SortableList
-    data={getDummyData()}
-    renderRow={_renderRow}
-  />
+export default function(props) {
+  return (
+    <SortableList
+      data={getDummyData()}
+      renderRow={_renderRow}
+    />
+  )
 }
 
 const styles = StyleSheet.create({
